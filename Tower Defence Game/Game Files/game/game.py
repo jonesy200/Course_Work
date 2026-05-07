@@ -1,33 +1,43 @@
 import pygame
 
 class TowerDefenceGame:
-    def __init__(self):
+    def __init__(self, width=800, height=600):
+        self.width = width
+        self.height = height
         self.clock = pygame.time.Clock()
+        self.running = True
 
-    def run(self):
-        pygame.init()
-        screen = pygame.display.set_mode((800, 600))
+        self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Tower Defence Game")
+        self.load_assets()
 
-        programIcon = pygame.image.load('grey shield logo.webp')
-        pygame.display.set_icon(programIcon)
+    def load_assets(self):
+        try:
+            self.icon = pygame.image.load('grey shield logo.webp')
+            pygame.display.set_icon(self.icon)
+        except pygame.error as error:
+            print(f"Could not load the icon: {error}")
 
-        #clock = pygame.time.Clock()
+        self.background = pygame.Surface(self.screen.get_size())
+        self.background = self.background.convert()
+        self.background.fill((0, 0, 0))
 
-        background = pygame.Surface(screen.get_size())
-        background = background.convert()
-        background.fill((0, 0, 0))
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
 
-        screen.blit(background, (0, 0))
+    def update(self):
+        pass
+
+    def draw(self):
+        self.screen.blit(self.background, (0, 0))
+
         pygame.display.flip()
 
-        while True:
+    def run(self):
+        while self.running:
             self.clock.tick(60)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    return
-
-            screen.blit(background, (0, 0))
-            pygame.display.flip()
-
+            self.handle_events()
+            self.update()
+            self.draw()
