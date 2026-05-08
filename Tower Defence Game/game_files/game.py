@@ -11,9 +11,8 @@ class TowerDefenceGame:
         pygame.display.set_caption("Tower Defence Game")
         self.load_assets()
 
-    def load_assets(self):
         try:
-            self.icon = pygame.image.load('grey shield logo.webp')
+            self.icon = pygame.image.load('assets/images/ui/logos/grey shield logo.webp')
             pygame.display.set_icon(self.icon)
         except pygame.error as error:
             print(f"Could not load the icon: {error}")
@@ -21,6 +20,9 @@ class TowerDefenceGame:
         self.background = pygame.Surface(self.screen.get_size())
         self.background = self.background.convert()
         self.background.fill((0, 0, 0))
+
+    def load_assets(self):
+        pass
 
     def handle_events(self):
         for event in pygame.event.get():
