@@ -1,5 +1,5 @@
 import pygame
-from game import TowerDefenceGame
+from game_files.game import TowerDefenceGame
 
 def main():
     pygame.init()

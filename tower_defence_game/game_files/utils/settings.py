@@ -1,0 +1,39 @@
+from pathlib import Path
+
+
+#DIRECTORIES
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+ASSETS_DIR = BASE_DIR / "assets"
+
+IMAGES_DIR = ASSETS_DIR / "images"
+SOUNDS_DIR = ASSETS_DIR / "sounds"
+FONTS_DIR = ASSETS_DIR / "fonts"
+
+UI_IMAGES_DIR = IMAGES_DIR / "ui"
+LOGOS_DIR = UI_IMAGES_DIR / "logos"
+
+DOWNLOADED_ASSETS_DIR = ASSETS_DIR / "downloaded_from_online"
+TINY_SWORDS_DIR = DOWNLOADED_ASSETS_DIR / "Tiny Swords (Free Pack)"
+
+UI_ELEMENTS_DIR = TINY_SWORDS_DIR / "UI Elements" / "UI Elements"
+BUTTONS_DIR = UI_ELEMENTS_DIR / "Buttons"
+
+TERRAIN_DIR = TINY_SWORDS_DIR / "Terrain"
+TILESET_DIR = TERRAIN_DIR / "Tileset"
+
+#ANIMATIONS
+ANIMATION_FPS = 10 #10fps / 100ms
+
+#CONSTANTS
+
+WIDTH = 800
+HEIGHT = 600
+FPS = 60
+
+TILE_SIZE = 128
+GRASS_GREEN = (40, 120, 60)
+
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+GREY = (200, 200, 200)
