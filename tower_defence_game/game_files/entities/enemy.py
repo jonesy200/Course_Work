@@ -1,5 +1,4 @@
 import pygame
-from game_files.utils.settings import WIDTH, HEIGHT, FPS
 
 class Enemy:
     def __init__(self, x, y, width, height, speed):

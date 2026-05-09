@@ -1,6 +1,6 @@
 import pygame
 from game_files.entities.enemy import Enemy
-from game_files.utils.button import Button
+from game_files.ui.button import Button
 from game_files.utils.settings import (
     LOGOS_DIR,
     TILESET_DIR,

@@ -1,4 +1,5 @@
 import pygame
+from game_files.utils.settings import HITBOXES
 
 class Button:
     def __init__(self, press_time, x, y, image, clicked_image, scale=1):
@@ -28,7 +29,8 @@ class Button:
                 self.click_time = None
 
         if self.rect.collidepoint(pos):
-            pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)
+            if HITBOXES == True:
+                pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)
             if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
                 self.clicked = True
                 self.click_time = pygame.time.get_ticks()
