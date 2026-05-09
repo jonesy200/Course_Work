@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 #DIRECTORIES
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -19,7 +18,9 @@ TINY_SWORDS_DIR = DOWNLOADED_ASSETS_DIR / "Tiny Swords (Free Pack)"
 
 #UI ELEMENTS
 UI_ELEMENTS_DIR = TINY_SWORDS_DIR / "UI Elements" / "UI Elements"
+
 BUTTONS_DIR = UI_ELEMENTS_DIR / "Buttons"
+PAPERS_DIR = UI_ELEMENTS_DIR / "Papers"
 
 #TERRAIN
 TERRAIN_DIR = TINY_SWORDS_DIR / "Terrain"
@@ -27,14 +28,17 @@ TILESET_DIR = TERRAIN_DIR / "Tileset"
 
 #UNITS
 UNITS_DIR = TINY_SWORDS_DIR / "Units"
+
 BLACK_UNITS_DIR = UNITS_DIR / "Black Units"
 BLACK_UNITS_WARRIOR_DIR = BLACK_UNITS_DIR / "Warrior"
+
+RED_UNITS_DIR = UNITS_DIR / "Red Units"
+RED_UNITS_WARRIOR_DIR = RED_UNITS_DIR / "Warrior"
 
 #ANIMATIONS
 ANIMATION_FPS = 10 #10fps / 100ms
 
 #CONSTANTS
-
 WIDTH = 800
 HEIGHT = 600
 FPS = 60
@@ -47,4 +51,4 @@ WHITE = (255, 255, 255)
 GREY = (200, 200, 200)
 
 #DEBUG
-HITBOXES = True
+HITBOXES = False

@@ -1,6 +1,8 @@
 import pygame
-from game_files.entities.enemy import Enemy
+from game_files.entities.units.enemy_units.enemy_unit_types.warrior_enemy_unit import EnemyUnitWarrior
+from game_files.entities.units.friendly_units.champion_units.warrior_champion_unit import WarriorChampionUnit
 from game_files.ui.button import Button
+from game_files.ui.menu import Menu
 from game_files.utils.settings import (
     LOGOS_DIR,
     TILESET_DIR,
@@ -27,20 +29,24 @@ class TowerDefenceGame:
         icon_path = LOGOS_DIR / "grey shield logo.webp"
         self.icon = pygame.image.load(icon_path)
         pygame.display.set_icon(self.icon)
-
-        self.background = self.create_backround()
+        self.background = self.create_background()
 
         self.blue_square_button_small_reg_img = pygame.image.load(blue_square_button_small_reg_path).convert_alpha()
         self.blue_square_button_small_pressed_img = pygame.image.load(blue_square_button_small_pressed_path).convert_alpha()
-        self.button1 = Button(500,20, 20, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
 
+        self.enemy_spawn_button = Button(500, 700, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
+        self.champion_spawn_button = Button(500, 615, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
 
         self.enemies = []
+        self.champion = WarriorChampionUnit(x=0, y=300)
+        self.champion_spawned = False
+
+        self.menu = Menu(self.screen, [self.enemy_spawn_button, self.champion_spawn_button])
 
 
-    def create_backround(self):#
-        backround = pygame.Surface((self.width, self.height))
-        backround.fill(GRASS_GREEN)
+    def create_background(self):#
+        background = pygame.Surface((self.width, self.height))
+        background.fill(GRASS_GREEN)
 
         try:
             tileset_path = TILESET_DIR / "Tilemap_color1.png"
@@ -50,29 +56,47 @@ class TowerDefenceGame:
 
             for y in range(0, self.height, TILE_SIZE):
                 for x in range(0, self.width, TILE_SIZE):
-                    backround.blit(grass_tile, (x, y))
+                    background.blit(grass_tile, (x, y))
 
         except pygame.error as error:
             print(f"Could not load the tileset: {error}")
 
-        return backround
+        return background
 
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
 
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.menu.toggle()
+
     def spawn_enemy(self):
-        enemy = Enemy(
+        enemy = EnemyUnitWarrior(
             x=0,
             y=300,
-            width=40,
-            height=40,
             speed=2
         )
         self.enemies.append(enemy)
 
     def update(self):
+        keys = pygame.key.get_pressed()
+        if self.champion_spawned:
+            self.champion.moving = False
+
+            if keys[pygame.K_d]:
+                self.champion.move_right()
+            if keys[pygame.K_a]:
+                self.champion.move_left()
+            if keys[pygame.K_w]:
+                self.champion.move_up()
+            if keys[pygame.K_s]:
+                self.champion.move_down()
+            if not self.champion.moving:
+                self.champion.set_state("idle")
+            self.champion.update()
+
         for enemy in self.enemies:
             enemy.update()
 
@@ -84,8 +108,19 @@ class TowerDefenceGame:
     def draw(self):
         self.screen.blit(self.background, (0,0))
 
-        if self.button1.draw(self.screen):
+        clicked = self.menu.draw()
+        if clicked == self.enemy_spawn_button:
             self.spawn_enemy()
+        elif clicked == self.champion_spawn_button:
+            self.champion_spawned = not self.champion_spawned
+            if self.champion_spawned:
+                self.champion.spawn(WIDTH // 2, HEIGHT // 2)
+            else:
+                self.champion.despawn()
+
+        if self.champion_spawned:
+            self.champion.draw(self.screen)
+
         for enemy in self.enemies:
             enemy.draw(self.screen)
 
@@ -95,5 +130,6 @@ class TowerDefenceGame:
         while self.running:
             self.clock.tick(FPS)
             self.handle_events()
-            self.update()
+            if not self.menu.open:
+                self.update()
             self.draw()
