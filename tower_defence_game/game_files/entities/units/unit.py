@@ -3,7 +3,7 @@ from game_files.utils.settings import ANIMATION_FPS
 
 
 class Unit:
-    def __init__(self, x, y, max_health=100, speed=10):
+    def __init__(self, x, y, max_health=100, speed=2):
         self.x = x
         self.y = y
         self.max_health = max_health

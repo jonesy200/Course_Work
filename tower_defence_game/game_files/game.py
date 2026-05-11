@@ -3,6 +3,7 @@ from game_files.entities.units.enemy_units.enemy_unit_types.warrior_enemy_unit i
 from game_files.entities.units.friendly_units.champion_units.warrior_champion_unit import WarriorChampionUnit
 from game_files.ui.button import Button
 from game_files.ui.menu import Menu
+from game_files.entities.projectiles.projectile import Projectile
 from game_files.utils.settings import (
     LOGOS_DIR,
     TILESET_DIR,
@@ -44,6 +45,10 @@ class TowerDefenceGame:
         self.menu = Menu(self.screen, [self.enemy_spawn_button, self.champion_spawn_button])
 
 
+        self.projectiles = []
+        self.arrows = []
+
+
     def create_background(self):#
         background = pygame.Surface((self.width, self.height))
         background.fill(GRASS_GREEN)
@@ -80,6 +85,17 @@ class TowerDefenceGame:
         )
         self.enemies.append(enemy)
 
+    def spawn_projectile(self, x, y):
+        projectile = Projectile(
+            x,
+            y,
+            radius=10,
+            colour=(0,0,0),
+            facing=self.champion.direction
+        )
+        return projectile
+
+
     def update(self):
         keys = pygame.key.get_pressed()
         if self.champion_spawned:
@@ -97,6 +113,8 @@ class TowerDefenceGame:
                 self.champion.set_state("idle")
             self.champion.update()
 
+            if keys[pygame.K_r]:
+                self.projectiles.append(self.spawn_projectile(self.champion.x, self.champion.y))
         for enemy in self.enemies:
             enemy.update()
 
@@ -123,6 +141,9 @@ class TowerDefenceGame:
 
         for enemy in self.enemies:
             enemy.draw(self.screen)
+
+        for projectile in self.projectiles:
+            projectile.draw(self.screen)
 
         pygame.display.flip()
 
