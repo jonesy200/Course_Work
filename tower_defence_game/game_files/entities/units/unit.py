@@ -1,6 +1,5 @@
 import pygame
-from game_files.utils.settings import ANIMATION_FPS
-
+from game_files.utils.settings import ANIMATION_FPS, HITBOXES
 
 class Unit:
     def __init__(self, x, y, max_health=100, speed=10):
@@ -26,7 +25,7 @@ class Unit:
 
         self.attack_damage = 25
         self.attack_range = 60
-        self.attack_cooldown = 500
+        self.attack_cooldown = 1000
         self.last_attack_time = 0
 
     def update(self):
@@ -43,10 +42,16 @@ class Unit:
         if not self.animations[self.state]:
             return
         frame = self.animations[self.state][self.frame_index]
+
         if self.direction == -1:
             frame = pygame.transform.flip(frame, True, False)
-        self.rect = frame.get_rect(topleft=(self.x, self.y))
-        screen.blit(frame, self.rect)
+
+        screen.blit(frame, (self.x,self.y))
+        bound = frame.get_bounding_rect()
+        self.rect = bound.move(self.x, self.y)
+
+        if HITBOXES:
+            pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)
 
     def move(self, dx, dy):
         if dx == 0 and dy == 0:

@@ -3,6 +3,7 @@ from game_files.entities.units.enemy_units.enemy_unit_types.warrior_enemy_unit i
 from game_files.entities.units.friendly_units.champion_units.warrior_champion_unit import WarriorChampionUnit
 from game_files.ui.button import Button
 from game_files.ui.menu import Menu
+from game_files.entities.projectiles.projectile import Projectile
 from game_files.utils.settings import (
     LOGOS_DIR,
     TILESET_DIR,
@@ -86,14 +87,16 @@ class TowerDefenceGame:
             self.champion.moving = False
 
             if keys[pygame.K_d]:
-                self.champion.move_right()
+                self.champion.move(self.champion.speed, 0)
             if keys[pygame.K_a]:
-                self.champion.move_left()
+                self.champion.move(-self.champion.speed, 0)
             if keys[pygame.K_w]:
-                self.champion.move_up()
+                self.champion.move(0, -self.champion.speed)
             if keys[pygame.K_s]:
-                self.champion.move_down()
-            if not self.champion.moving:
+                self.champion.move(0, self.champion.speed)
+            if keys[pygame.K_SPACE]:
+                self.champion.attack()
+            if not self.champion.moving and self.champion.state not in ["attack1", "attack2", "guard"]:
                 self.champion.set_state("idle")
             self.champion.update()
 

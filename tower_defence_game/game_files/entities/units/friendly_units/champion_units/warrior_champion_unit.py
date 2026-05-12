@@ -1,7 +1,7 @@
 import pygame
 from game_files.entities.units.unit import Unit
 from game_files.systems.spritesheet import Spritesheet
-from game_files.utils.settings import BLACK_UNITS_WARRIOR_DIR
+from game_files.utils.settings import BLACK_UNITS_WARRIOR_DIR, ANIMATION_FPS
 
 
 class WarriorChampionUnit(Unit):
@@ -30,19 +30,29 @@ class WarriorChampionUnit(Unit):
     def despawn(self):
         self.health = 0
 
-    def move_right(self):
-        self.move(self.speed, 0)
-        self.set_state("walk" if self.moving else "idle")
+    def update(self):
+        if not self.animations[self.state]:
+            return
+        now = pygame.time.get_ticks()
+        if self.state in ["attack1", "attack2"]:
+            frame_delay = 1000 // 5  # 5 fps for attacks = slower
+        else:
+            frame_delay = 1000 // ANIMATION_FPS
+        if now - self.last_frame_time >= frame_delay:
+            self.frame_index = (self.frame_index + 1) % len(self.animations[self.state])
+            self.last_frame_time = now
 
-    def move_left(self):
-        self.move(-self.speed, 0)
-        self.set_state("walk" if self.moving else "idle")
+        if self.state in ["attack1", "attack2"] and self.frame_index == len(self.animations[self.state]) - 1:
+            self.set_state("idle")
 
-    def move_up(self):
-        self.move(0, -self.speed)
-        self.set_state("walk" if self.moving else "idle")
+    def attack(self):
+        now = pygame.time.get_ticks()
+        if now - self.last_attack_time >= self.attack_cooldown and self.state not in ["attack1", "attack2"]:
+            self.last_attack_time = now
+            self.set_state("attack1")
 
-    def move_down(self):
-        self.move(0, self.speed)
-        self.set_state("walk" if self.moving else "idle")
+    def move(self, dx, dy):
+        super().move(dx, dy)
+        if self.state not in ["attack1", "attack2"]:
+            self.set_state("walk" if self.moving else "idle")
 
