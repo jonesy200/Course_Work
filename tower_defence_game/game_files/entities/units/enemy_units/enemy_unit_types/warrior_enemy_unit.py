@@ -5,7 +5,7 @@ from game_files.utils.settings import RED_UNITS_WARRIOR_DIR
 
 
 class EnemyUnitWarrior(EnemyUnit):
-    def __init__(self, x, y, max_health=100, speed=10):
+    def __init__(self, x, y, max_health=100, speed=2):
         super().__init__(x, y, max_health, speed)
 
         self.path = RED_UNITS_WARRIOR_DIR
