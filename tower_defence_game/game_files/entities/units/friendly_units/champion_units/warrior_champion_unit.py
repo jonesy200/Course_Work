@@ -1,58 +1,28 @@
 import pygame
-from game_files.entities.units.unit import Unit
+from game_files.entities.units.friendly_units.champion_units.champion_unit import ChampionUnit
 from game_files.systems.spritesheet import Spritesheet
-from game_files.utils.settings import BLACK_UNITS_WARRIOR_DIR, ANIMATION_FPS
+from game_files.utils.settings import BLACK_UNITS_WARRIOR_DIR
 
-
-class WarriorChampionUnit(Unit):
+class WarriorChampionUnit(ChampionUnit):
     def __init__(self, x, y):
         super().__init__(x, y)
+        self.type = "warrior"
 
         self.path = BLACK_UNITS_WARRIOR_DIR
         self.sprite = Spritesheet("Warrior_Idle.png", path=self.path)
         self.walk_sprite = Spritesheet("Warrior_Run.png", path=self.path)
-        self.attack1_sprite = Spritesheet("Warrior_Attack1.png", path=self.path)
-        self.attack2_sprite = Spritesheet("Warrior_Attack2.png", path=self.path)
+        self.attack_sprite = Spritesheet("Warrior_Attack1.png", path=self.path)
         self.guard_sprite = Spritesheet("Warrior_Guard.png", path=self.path)
+
         self.animations["idle"] = self.sprite.get_frames_row(0, 192, 192, 8)
         self.animations["walk"] = self.walk_sprite.get_frames_row(0, 192, 192, 6)
+        self.animations["attack"] = self.attack_sprite.get_frames_row(0, 192, 192, 4)
         self.animations["guard"] = self.guard_sprite.get_frames_row(0, 192, 192, 6)
-        self.animations["attack1"] = self.attack1_sprite.get_frames_row(0, 192, 192, 4)
-        self.animations["attack2"] = self.attack2_sprite.get_frames_row(0, 192, 192, 4)
-
-    def spawn(self, x, y):
-        self.x = x
-        self.y = y
-        self.health = 100
-        self.speed = 2
-        self.set_state("idle")
-
-    def despawn(self):
-        self.health = 0
-
-    def update(self):
-        if not self.animations[self.state]:
-            return
-        now = pygame.time.get_ticks()
-        if self.state in ["attack1", "attack2"]:
-            frame_delay = 1000 // 5  # 5 fps for attacks = slower
-        else:
-            frame_delay = 1000 // ANIMATION_FPS
-        if now - self.last_frame_time >= frame_delay:
-            self.frame_index = (self.frame_index + 1) % len(self.animations[self.state])
-            self.last_frame_time = now
-
-        if self.state in ["attack1", "attack2"] and self.frame_index == len(self.animations[self.state]) - 1:
-            self.set_state("idle")
 
     def attack(self):
         now = pygame.time.get_ticks()
-        if now - self.last_attack_time >= self.attack_cooldown and self.state not in ["attack1", "attack2"]:
+        if now - self.last_attack_time >= self.attack_cooldown:
             self.last_attack_time = now
-            self.set_state("attack1")
+            self.set_state("attack")
 
-    def move(self, dx, dy):
-        super().move(dx, dy)
-        if self.state not in ["attack1", "attack2"]:
-            self.set_state("walk" if self.moving else "idle")
 

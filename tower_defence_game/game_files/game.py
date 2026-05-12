@@ -1,5 +1,6 @@
 import pygame
 from game_files.entities.units.enemy_units.enemy_unit_types.warrior_enemy_unit import EnemyUnitWarrior
+from game_files.entities.units.friendly_units.champion_units.archer_champion_unit import ArcherChampionUnit
 from game_files.entities.units.friendly_units.champion_units.warrior_champion_unit import WarriorChampionUnit
 from game_files.ui.button import Button
 from game_files.ui.menu import Menu
@@ -12,11 +13,10 @@ from game_files.utils.settings import (
     FPS,
     GRASS_GREEN,
     TILE_SIZE,
-    BUTTONS_DIR
+    BUTTONS_DIR,
+    BLUE_UNITS_ARCHER_ARROW_DIR
 )
 
-blue_square_button_small_reg_path = BUTTONS_DIR / "SmallBlueSquareButton_Regular.png"
-blue_square_button_small_pressed_path = BUTTONS_DIR / "SmallBlueSquareButton_Pressed.png"
 
 class TowerDefenceGame:
     def __init__(self):
@@ -32,22 +32,27 @@ class TowerDefenceGame:
         pygame.display.set_icon(self.icon)
         self.background = self.create_background()
 
+        blue_square_button_small_reg_path = BUTTONS_DIR / "SmallBlueSquareButton_Regular.png"
+        blue_square_button_small_pressed_path = BUTTONS_DIR / "SmallBlueSquareButton_Pressed.png"
+
+        self.arrow_img = pygame.image.load(BLUE_UNITS_ARCHER_ARROW_DIR).convert_alpha()
+
         self.blue_square_button_small_reg_img = pygame.image.load(blue_square_button_small_reg_path).convert_alpha()
         self.blue_square_button_small_pressed_img = pygame.image.load(blue_square_button_small_pressed_path).convert_alpha()
 
         self.enemy_spawn_button = Button(500, 700, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
-        self.champion_spawn_button = Button(500, 615, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
+        self.warrior_champion_spawn_button = Button(500, 615, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
+        self.archer_champion_spawn_button = Button(500, 615, 80, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
 
         self.enemies = []
-        self.champion = WarriorChampionUnit(x=0, y=300)
+
+        self.champion = None
         self.champion_spawned = False
 
-        self.menu = Menu(self.screen, [self.enemy_spawn_button, self.champion_spawn_button])
-
+        self.menu = Menu(self.screen, [self.enemy_spawn_button, self.warrior_champion_spawn_button, self.archer_champion_spawn_button])
 
         self.projectiles = []
         self.arrows = []
-
 
     def create_background(self):#
         background = pygame.Surface((self.width, self.height))
@@ -86,12 +91,13 @@ class TowerDefenceGame:
         self.enemies.append(enemy)
 
     def spawn_projectile(self, x, y):
+        mouse_x, mouse_y = pygame.mouse.get_pos()
         projectile = Projectile(
             x,
             y,
-            radius=10,
-            colour=(0,0,0),
-            facing=self.champion.direction
+            target_x=mouse_x,
+            target_y=mouse_y,
+            image=self.arrow_img
         )
         return projectile
 
@@ -111,12 +117,21 @@ class TowerDefenceGame:
                 self.champion.move(0, self.champion.speed)
             if keys[pygame.K_SPACE]:
                 self.champion.attack()
-            if not self.champion.moving and self.champion.state not in ["attack1", "attack2", "guard"]:
+            if not self.champion.moving and self.champion.state not in ["attack", "guard"]:
                 self.champion.set_state("idle")
             self.champion.update()
 
-            if keys[pygame.K_r]:
-                self.projectiles.append(self.spawn_projectile(self.champion.x, self.champion.y))
+            if keys[pygame.K_r] and self.champion is not None:
+                self.projectiles.append(self.spawn_projectile(self.champion.rect.left, self.champion.rect.centery))
+
+        for projectile in self.projectiles:
+            projectile.update()
+
+        self.projectiles = [
+            projectile for projectile in self.projectiles
+            if projectile.alive and not projectile.is_off_screen()
+        ]
+
         for enemy in self.enemies:
             enemy.update()
 
@@ -131,7 +146,20 @@ class TowerDefenceGame:
         clicked = self.menu.draw()
         if clicked == self.enemy_spawn_button:
             self.spawn_enemy()
-        elif clicked == self.champion_spawn_button:
+        elif clicked == self.warrior_champion_spawn_button:
+            self.champion = WarriorChampionUnit(x=0, y=300)
+            self.champion.projectiles = self.projectiles
+            self.champion.arrow_img = self.arrow_img
+            self.champion_spawned = not self.champion_spawned
+            if self.champion_spawned:
+                self.champion.spawn(WIDTH // 2, HEIGHT // 2)
+            else:
+                self.champion.despawn()
+
+        elif clicked == self.archer_champion_spawn_button:
+            self.champion = ArcherChampionUnit(x=0, y=300)
+            self.champion.projectiles = self.projectiles
+            self.champion.arrow_img = self.arrow_img
             self.champion_spawned = not self.champion_spawned
             if self.champion_spawned:
                 self.champion.spawn(WIDTH // 2, HEIGHT // 2)
