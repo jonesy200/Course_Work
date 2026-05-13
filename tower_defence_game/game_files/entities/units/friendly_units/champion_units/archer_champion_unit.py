@@ -8,7 +8,6 @@ class ArcherChampionUnit(ChampionUnit):
     def __init__(self, x, y):
         super().__init__(x, y, max_health=80, speed=3)
         self.type = "archer"
-        self.projectiles = None
         self.arrow_img = pygame.image.load(BLACK_UNITS_ARCHER_ARROW_DIR).convert_alpha()
 
         self.path = BLACK_UNITS_ARCHER_DIR
@@ -24,25 +23,31 @@ class ArcherChampionUnit(ChampionUnit):
         if self.projectiles is None or self.arrow_img is None:
             return
 
+        try:
+            if self.projectiles[0].alive:
+                return
+        except:
 
-        print("arrow fired")
+            print("arrow fired")
 
-        mouse_x, mouse_y = pygame.mouse.get_pos()
+            spawn_x = self.rect.right if self.direction == 1 else self.rect.left
+            spawn_y = self.rect.centery
 
-        spawn_x = self.rect.right if self.direction == 1 else self.rect.left
-        spawn_y = self.rect.centery
-
-        projectile = Projectile(
-            spawn_x,
-            spawn_y,
-            target_x=mouse_x,
-            target_y=mouse_y,
-            image=self.arrow_img
-        )
-        self.projectiles.append(projectile)
+            self.projectiles.append(self.spawn_projectile(self.arrow_img, spawn_x, spawn_y))
 
     def attack(self):
         now = pygame.time.get_ticks()
         if now - self.last_attack_time >= self.attack_cooldown:
             self.last_attack_time = now
             self.set_state("attack")
+
+    def spawn_projectile(self,arrow_img, x, y):
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        self.projectile = Projectile(
+            x,
+            y,
+            target_x=mouse_x,
+            target_y=mouse_y,
+            image=arrow_img
+        )
+        return self.projectile

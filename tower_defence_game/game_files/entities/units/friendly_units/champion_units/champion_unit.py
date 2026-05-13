@@ -49,7 +49,10 @@ class ChampionUnit(FriendlyUnit):
             self.frame_index = (self.frame_index + 1) % len(self.animations[self.state])
             self.last_frame_time = now
 
-        if self.state == "attack" and self.frame_index == len(self.animations[self.state]) - 1:
+        if self.state == "attack" and self.frame_index == len(self.animations[self.state]) - 3 and self.type == 'archer':
+            self.on_attack_finish()
+
+        elif self.state == "attack" and self.frame_index == len(self.animations[self.state]) - 1:
             self.on_attack_finish()
             self.set_state("idle")
 

@@ -4,7 +4,6 @@ from game_files.entities.units.friendly_units.champion_units.archer_champion_uni
 from game_files.entities.units.friendly_units.champion_units.warrior_champion_unit import WarriorChampionUnit
 from game_files.ui.button import Button
 from game_files.ui.menu import Menu
-from game_files.entities.projectiles.projectile import Projectile
 from game_files.utils.settings import (
     LOGOS_DIR,
     TILESET_DIR,
@@ -90,18 +89,6 @@ class TowerDefenceGame:
         )
         self.enemies.append(enemy)
 
-    def spawn_projectile(self, x, y):
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-        projectile = Projectile(
-            x,
-            y,
-            target_x=mouse_x,
-            target_y=mouse_y,
-            image=self.arrow_img
-        )
-        return projectile
-
-
     def update(self):
         keys = pygame.key.get_pressed()
         if self.champion_spawned:
@@ -121,16 +108,22 @@ class TowerDefenceGame:
                 self.champion.set_state("idle")
             self.champion.update()
 
-            if keys[pygame.K_r] and self.champion is not None:
+            '''if keys[pygame.K_r] and self.champion is not None:
                 self.projectiles.append(self.spawn_projectile(self.champion.rect.left, self.champion.rect.centery))
-
+'''
         for projectile in self.projectiles:
             projectile.update()
 
-        self.projectiles = [
+        '''self.projectiles = [
             projectile for projectile in self.projectiles
             if projectile.alive and not projectile.is_off_screen()
-        ]
+        ]'''
+
+        if self.champion_spawned:
+            self.projectiles = [
+                projectile for projectile in self.champion.projectiles
+                if projectile.alive and not projectile.is_off_screen()
+            ]
 
         for enemy in self.enemies:
             enemy.update()

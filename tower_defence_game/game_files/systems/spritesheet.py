@@ -1,5 +1,4 @@
 import pygame
-from game_files.utils.settings import *
 
 class Spritesheet:
     def __init__(self, filename, path):
