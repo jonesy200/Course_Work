@@ -108,16 +108,23 @@ class TowerDefenceGame:
                 self.champion.set_state("idle")
             self.champion.update()
 
-            '''if keys[pygame.K_r] and self.champion is not None:
-                self.projectiles.append(self.spawn_projectile(self.champion.rect.left, self.champion.rect.centery))
-'''
+            if self.enemies:
+                for enemy in self.enemies:
+                    if self.champion.check_collision(enemy.rect):
+                        print("unit collision")
+                    for projectile in self.projectiles:
+                        if projectile.check_collision(enemy.rect):
+                            print("arrow collision")
+
+        '''    def check_collision(self, rect2):
+                if self.rect.colliderect(rect2):
+                    print("detected collision")
+                    return True
+                else:
+                    return False'''
+
         for projectile in self.projectiles:
             projectile.update()
-
-        '''self.projectiles = [
-            projectile for projectile in self.projectiles
-            if projectile.alive and not projectile.is_off_screen()
-        ]'''
 
         if self.champion_spawned:
             self.projectiles = [

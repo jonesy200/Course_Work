@@ -53,12 +53,10 @@ class ChampionUnit(FriendlyUnit):
             self.on_attack_finish()
 
         elif self.state == "attack" and self.frame_index == len(self.animations[self.state]) - 1:
-            self.on_attack_finish()
             self.set_state("idle")
+            if self.projectiles:
+                self.projectiles = []
 
-        '''if self.state == "attack" and self.frame_index == len(self.animations[self.state]) - 3 and self.type == "archer":
-            self.on_attack_finish()
-'''
     def move(self, dx, dy):
         super().move(dx, dy)
         if self.state not in ["attack"]:

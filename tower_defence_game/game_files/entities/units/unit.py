@@ -1,7 +1,8 @@
 import pygame
 from game_files.utils.settings import ANIMATION_FPS, HITBOXES
+from game_files.entities.entity import Entity
 
-class Unit:
+class Unit(Entity):
     def __init__(self, x, y, max_health=100, speed=2):
         self.x = x
         self.y = y
@@ -55,7 +56,12 @@ class Unit:
         self.rect = bound.move(self.x, self.y)
 
         if HITBOXES:
-            pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)
+            self.show_hitbox(screen, (255,0,0))
+
+
+
+    def show_hitbox(self, screen, colour):
+        pygame.draw.rect(screen, colour, self.rect, 2)
 
     def move(self, dx, dy):
         if dx == 0 and dy == 0:

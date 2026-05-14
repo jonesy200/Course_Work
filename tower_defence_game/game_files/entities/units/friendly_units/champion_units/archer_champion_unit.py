@@ -30,7 +30,10 @@ class ArcherChampionUnit(ChampionUnit):
 
             print("arrow fired")
 
-            spawn_x = self.rect.right if self.direction == 1 else self.rect.left
+            if self.direction == 1:
+                spawn_x = self.rect.right
+            else: spawn_x = self.rect.left
+
             spawn_y = self.rect.centery
 
             self.projectiles.append(self.spawn_projectile(self.arrow_img, spawn_x, spawn_y))

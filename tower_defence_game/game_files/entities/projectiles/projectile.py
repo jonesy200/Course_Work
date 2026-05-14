@@ -1,9 +1,9 @@
 import pygame
 import math
 from game_files.utils.settings import PROJECTILE_VELOCITY, WIDTH, HEIGHT, HITBOXES
+from game_files.entities.entity import Entity
 
-
-class Projectile:
+class Projectile(Entity):
     def __init__(self, x, y, target_x, target_y, image):
         self.x = x
         self.y = y
