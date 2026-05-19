@@ -6,6 +6,7 @@ class Entity:
         self.x = x
         self.y = y
         self.rect = pygame.Rect(self.x, self.y, 1, 1)
+        self.hitbox_colour = (255, 0, 0)
 
     def check_collision(self, rect2):
         if self.rect.colliderect(rect2):

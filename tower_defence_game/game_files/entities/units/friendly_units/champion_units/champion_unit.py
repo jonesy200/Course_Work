@@ -57,7 +57,7 @@ class ChampionUnit(FriendlyUnit):
             if self.projectiles:
                 self.projectiles = []
 
-    def move(self, dx, dy):
+    def move(self, dx, dy, colliders=None):
         super().move(dx, dy)
         if self.state not in ["attack"]:
             self.set_state("walk" if self.moving else "idle")

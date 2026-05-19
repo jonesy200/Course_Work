@@ -4,10 +4,10 @@ from game_files.utils.settings import PROJECTILE_VELOCITY, WIDTH, HEIGHT, HITBOX
 from game_files.entities.entity import Entity
 
 class Projectile(Entity):
-    def __init__(self, x, y, target_x, target_y, image):
-        self.x = x
-        self.y = y
+    def __init__(self, x, y, target_x, target_y, image, damage=67):
+        super().__init__(None, x, y)
         self.image = image
+        self.damage = damage
 
         dx = target_x - x
         dy = target_y - y
@@ -55,7 +55,7 @@ class Projectile(Entity):
         self.rect = bound.move(draw_x, draw_y)
 
         if HITBOXES:
-            pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)
+            pygame.draw.rect(screen, self.hitbox_colour, self.rect, 2)
 
     def is_off_screen(self):
         return (

@@ -4,8 +4,8 @@ from game_files.entities.entity import Entity
 
 class Unit(Entity):
     def __init__(self, x, y, max_health=100, speed=2):
-        self.x = x
-        self.y = y
+        super().__init__(None, x, y)
+
         self.max_health = max_health
         self.health = max_health
         self.speed = speed
@@ -56,7 +56,7 @@ class Unit(Entity):
         self.rect = bound.move(self.x, self.y)
 
         if HITBOXES:
-            self.show_hitbox(screen, (255,0,0))
+            self.show_hitbox(screen, self.hitbox_colour)
 
 
 

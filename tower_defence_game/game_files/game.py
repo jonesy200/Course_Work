@@ -39,9 +39,9 @@ class TowerDefenceGame:
         self.blue_square_button_small_reg_img = pygame.image.load(blue_square_button_small_reg_path).convert_alpha()
         self.blue_square_button_small_pressed_img = pygame.image.load(blue_square_button_small_pressed_path).convert_alpha()
 
-        self.enemy_spawn_button = Button(500, 700, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
-        self.warrior_champion_spawn_button = Button(500, 615, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
-        self.archer_champion_spawn_button = Button(500, 615, 80, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
+        self.enemy_spawn_button = Button(500, 1500, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
+        self.warrior_champion_spawn_button = Button(500, 1415, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
+        self.archer_champion_spawn_button = Button(500, 1415, 80, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
 
         self.enemies = []
 
@@ -92,16 +92,23 @@ class TowerDefenceGame:
     def update(self):
         keys = pygame.key.get_pressed()
         if self.champion_spawned:
+            colliders = []
+            for e in self.enemies:
+                colliders.append(e)
+
             self.champion.moving = False
 
+            dx = dy = 0
             if keys[pygame.K_d]:
-                self.champion.move(self.champion.speed, 0)
+                dx += self.champion.speed
             if keys[pygame.K_a]:
-                self.champion.move(-self.champion.speed, 0)
+                dx -= self.champion.speed
             if keys[pygame.K_w]:
-                self.champion.move(0, -self.champion.speed)
+                dy -= self.champion.speed
             if keys[pygame.K_s]:
-                self.champion.move(0, self.champion.speed)
+                dy += self.champion.speed
+            self.champion.move(dx, dy)
+
             if keys[pygame.K_SPACE]:
                 self.champion.attack()
             if not self.champion.moving and self.champion.state not in ["attack", "guard"]:
@@ -111,20 +118,16 @@ class TowerDefenceGame:
             if self.enemies:
                 for enemy in self.enemies:
                     if self.champion.check_collision(enemy.rect):
+                        self.champion.hitbox_colour = (0, 255, 0)
                         print("unit collision")
+                    else:
+                        self.champion.hitbox_colour = (255, 0, 0)
                     for projectile in self.projectiles:
                         if projectile.check_collision(enemy.rect):
+                            enemy.take_damage(projectile.damage)
+                            projectile.alive = False
                             print("arrow collision")
 
-        '''    def check_collision(self, rect2):
-                if self.rect.colliderect(rect2):
-                    print("detected collision")
-                    return True
-                else:
-                    return False'''
-
-        for projectile in self.projectiles:
-            projectile.update()
 
         if self.champion_spawned:
             self.projectiles = [
@@ -132,13 +135,13 @@ class TowerDefenceGame:
                 if projectile.alive and not projectile.is_off_screen()
             ]
 
-        for enemy in self.enemies:
-            enemy.update()
-
         self.enemies = [
             enemy for enemy in self.enemies
             if enemy.rect.left < self.width
         ]
+
+        for enemy in self.enemies: enemy.update()
+        for projectile in self.projectiles: projectile.update()
 
     def draw(self):
         self.screen.blit(self.background, (0,0))
@@ -169,11 +172,8 @@ class TowerDefenceGame:
         if self.champion_spawned:
             self.champion.draw(self.screen)
 
-        for enemy in self.enemies:
-            enemy.draw(self.screen)
-
-        for projectile in self.projectiles:
-            projectile.draw(self.screen)
+        for enemy in self.enemies: enemy.draw(self.screen)
+        for projectile in self.projectiles: projectile.draw(self.screen)
 
         pygame.display.flip()
 
