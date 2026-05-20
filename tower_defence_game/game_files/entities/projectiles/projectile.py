@@ -20,10 +20,16 @@ class Projectile(Entity):
             self.vel_x = (dx / distance) * PROJECTILE_VELOCITY
             self.vel_y = (dy / distance) * PROJECTILE_VELOCITY
 
+        travel_time = distance / PROJECTILE_VELOCITY
+
         self.z = 0
-        self.vel_z = 6.0
         self.gravity = 0.35
+        self.vel_z = (self.gravity * travel_time) / 2
+
         self.alive = True
+        self.grounded_timer = 0
+
+        self.angle = math.degrees(math.atan2(-dy, dx))
 
     def update(self):
         self.x += self.vel_x
@@ -34,10 +40,16 @@ class Projectile(Entity):
 
         if self.z <= 0:
             self.z = 0
-            self.alive = False
+            self.vel_z = 0
+            self.vel_x = 0
+            self.vel_y = 0
+
+            self.grounded_timer += 1
+            if self.grounded_timer > 30:
+                self.alive = False
 
     def draw(self, screen):
-        angle = math.degrees(math.atan2(-self.vel_y, self.vel_x))
+        angle = self.angle
 
         rotated_image = pygame.transform.rotate(self.image, angle)
         draw_x = int(self.x - rotated_image.get_width() / 2)
@@ -59,6 +71,6 @@ class Projectile(Entity):
 
     def is_off_screen(self):
         return (
-            self.x < -50 or self.x > WIDTH + 50 or
-            self.y < -50 or self.y > HEIGHT + 50
+                self.x < -200 or self.x > WIDTH + 200 or
+                self.y < -200 or self.y > HEIGHT + 200
         )
