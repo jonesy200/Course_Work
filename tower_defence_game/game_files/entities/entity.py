@@ -8,6 +8,9 @@ class Entity:
         self.rect = pygame.Rect(self.x, self.y, 1, 1)
         self.hitbox_colour = (255, 0, 0)
 
+        self.image = None
+
+
     def check_collision(self, rect2):
         if self.rect.colliderect(rect2):
             print("detected collision")

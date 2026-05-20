@@ -34,8 +34,6 @@ class TowerDefenceGame:
         blue_square_button_small_reg_path = BUTTONS_DIR / "SmallBlueSquareButton_Regular.png"
         blue_square_button_small_pressed_path = BUTTONS_DIR / "SmallBlueSquareButton_Pressed.png"
 
-        self.arrow_img = pygame.image.load(BLUE_UNITS_ARCHER_ARROW_DIR).convert_alpha()
-
         self.blue_square_button_small_reg_img = pygame.image.load(blue_square_button_small_reg_path).convert_alpha()
         self.blue_square_button_small_pressed_img = pygame.image.load(blue_square_button_small_pressed_path).convert_alpha()
 
@@ -98,6 +96,9 @@ class TowerDefenceGame:
 
             self.champion.moving = False
 
+            if keys[pygame.K_BACKSPACE]:
+                self.champion.health=0
+
             dx = dy = 0
             if keys[pygame.K_d]:
                 dx += self.champion.speed
@@ -115,7 +116,12 @@ class TowerDefenceGame:
                 self.champion.set_state("idle")
             self.champion.update()
 
-            if self.enemies:
+            if self.champion.health <= 0:
+                self.champion = None
+                self.champion_spawned = False
+
+
+        if self.enemies:
                 for enemy in self.enemies:
                     if self.champion.check_collision(enemy.rect):
                         self.champion.hitbox_colour = (0, 255, 0)
@@ -129,30 +135,27 @@ class TowerDefenceGame:
                             print("arrow collision")
 
 
-        if self.champion_spawned:
-            self.projectiles = [
-                projectile for projectile in self.champion.projectiles
-                if projectile.alive and not projectile.is_off_screen()
-            ]
 
         self.enemies = [
             enemy for enemy in self.enemies
             if enemy.rect.left < self.width
         ]
 
-        for enemy in self.enemies: enemy.update()
+        for enemy in self.enemies:
+            enemy.update()
+            if enemy.health <= 0:
+                self.enemies.remove(enemy)
+
         for projectile in self.projectiles: projectile.update()
 
     def draw(self):
         self.screen.blit(self.background, (0,0))
-
         clicked = self.menu.draw()
         if clicked == self.enemy_spawn_button:
             self.spawn_enemy()
         elif clicked == self.warrior_champion_spawn_button:
             self.champion = WarriorChampionUnit(x=0, y=300)
             self.champion.projectiles = self.projectiles
-            self.champion.arrow_img = self.arrow_img
             self.champion_spawned = not self.champion_spawned
             if self.champion_spawned:
                 self.champion.spawn(WIDTH // 2, HEIGHT // 2)
@@ -162,7 +165,6 @@ class TowerDefenceGame:
         elif clicked == self.archer_champion_spawn_button:
             self.champion = ArcherChampionUnit(x=0, y=300)
             self.champion.projectiles = self.projectiles
-            self.champion.arrow_img = self.arrow_img
             self.champion_spawned = not self.champion_spawned
             if self.champion_spawned:
                 self.champion.spawn(WIDTH // 2, HEIGHT // 2)
@@ -171,9 +173,13 @@ class TowerDefenceGame:
 
         if self.champion_spawned:
             self.champion.draw(self.screen)
+            self.champion.draw_health(self.screen)
 
-        for enemy in self.enemies: enemy.draw(self.screen)
+        for enemy in self.enemies: enemy.draw(self.screen), enemy.draw_health(self.screen)
         for projectile in self.projectiles: projectile.draw(self.screen)
+
+        if self.champion_spawned:
+            self.projectiles = [projectile for projectile in self.champion.projectiles if projectile.alive and not projectile.is_off_screen()]
 
         pygame.display.flip()
 

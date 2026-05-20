@@ -19,24 +19,22 @@ class ArcherChampionUnit(ChampionUnit):
         self.animations["walk"] = self.walk_sprite.get_frames_row(0, 192, 192, 4)
         self.animations["attack"] = self.attack_sprite.get_frames_row(0, 192, 192, 8)
 
+
     def on_attack_finish(self):
         if self.projectiles is None or self.arrow_img is None:
+            print("missing projectile list or arrow image")
             return
 
-        try:
-            if self.projectiles[0].alive:
-                return
-        except:
+        print("arrow fired")
 
-            print("arrow fired")
+        if self.direction == 1:
+            spawn_x = self.rect.right
+        else: spawn_x = self.rect.left
 
-            if self.direction == 1:
-                spawn_x = self.rect.right
-            else: spawn_x = self.rect.left
+        spawn_y = self.rect.centery
 
-            spawn_y = self.rect.centery
+        self.projectiles.append(self.spawn_projectile(self.arrow_img, spawn_x, spawn_y))
 
-            self.projectiles.append(self.spawn_projectile(self.arrow_img, spawn_x, spawn_y))
 
     def attack(self):
         now = pygame.time.get_ticks()

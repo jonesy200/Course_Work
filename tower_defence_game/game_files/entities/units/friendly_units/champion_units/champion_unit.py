@@ -24,6 +24,7 @@ class ChampionUnit(FriendlyUnit):
         self.last_attack_time = 0
 
         self.projectiles = None
+        self.projectile_fired = False
 
     def spawn(self, x, y):
         self.x = x
@@ -50,12 +51,17 @@ class ChampionUnit(FriendlyUnit):
             self.last_frame_time = now
 
         if self.state == "attack" and self.frame_index == len(self.animations[self.state]) - 3 and self.type == 'archer':
-            self.on_attack_finish()
+            if not self.projectile_fired:
+                self.on_attack_finish()
+            self.projectile_fired = True
 
-        elif self.state == "attack" and self.frame_index == len(self.animations[self.state]) - 1:
+        elif self.state == "attack" and self.frame_index == len(self.animations[self.state]) - 1 and self.type != 'archer':
+            self.on_attack_finish()
             self.set_state("idle")
-            if self.projectiles:
-                self.projectiles = []
+
+        if self.state == "attack" and self.frame_index == len(self.animations[self.state]) - 1:
+            self.projectile_fired = False
+            self.set_state("idle")
 
     def move(self, dx, dy, colliders=None):
         super().move(dx, dy)
