@@ -1,22 +1,17 @@
 import pygame
 from game_files.entities.units.friendly_units.friendly_unit import FriendlyUnit
-from game_files.utils.settings import ANIMATION_FPS
+from game_files.utils.settings import ANIMATION_FPS, MACHINEGUN
 
 class ChampionUnit(FriendlyUnit):
-    def __init__(self, x, y, max_health=100, speed=2):
-        super().__init__(x, y, max_health, speed)
+    def __init__(self, game, x, y, max_health=100, speed=2):
+        super().__init__(game, x, y, max_health, speed, groups=[game.champions])
         self.type = None
 
         self.state = "idle"
         self.frame_index = 0
         self.last_frame_time = 0
 
-        self.animations = {
-            "idle": [],
-            "walk": [],
-            "attack": [],
-            "guard": [],
-        }
+        self.animations["guard"] = []
 
         self.attack_damage = 25
         self.attack_range = 60
@@ -33,9 +28,13 @@ class ChampionUnit(FriendlyUnit):
         self.set_state("idle")
 
     def despawn(self):
-        self.health = 0
+        self.kill()
 
     def update(self):
+        if self.health <= 0:
+            super().update()
+            return
+
         if not self.animations.get(self.state):
             return
 
@@ -53,7 +52,7 @@ class ChampionUnit(FriendlyUnit):
         if self.state == "attack" and self.frame_index == len(self.animations[self.state]) - 3 and self.type == 'archer':
             if not self.projectile_fired:
                 self.on_attack_finish()
-            self.projectile_fired = True
+                self.projectile_fired = True
 
         elif self.state == "attack" and self.frame_index == len(self.animations[self.state]) - 1 and self.type != 'archer':
             self.on_attack_finish()

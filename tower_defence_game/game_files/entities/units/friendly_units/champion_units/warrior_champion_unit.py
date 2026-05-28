@@ -4,8 +4,8 @@ from game_files.systems.spritesheet import Spritesheet
 from game_files.utils.settings import BLACK_UNITS_WARRIOR_DIR
 
 class WarriorChampionUnit(ChampionUnit):
-    def __init__(self, x, y):
-        super().__init__(x, y)
+    def __init__(self, game, x, y):
+        super().__init__(game, x, y)
         self.type = "warrior"
 
         self.path = BLACK_UNITS_WARRIOR_DIR

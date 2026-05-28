@@ -1,4 +1,5 @@
 import pygame
+import random
 from game_files.entities.units.enemy_units.enemy_unit_types.warrior_enemy_unit import EnemyUnitWarrior
 from game_files.entities.units.friendly_units.champion_units.archer_champion_unit import ArcherChampionUnit
 from game_files.entities.units.friendly_units.champion_units.warrior_champion_unit import WarriorChampionUnit
@@ -13,7 +14,8 @@ from game_files.utils.settings import (
     GRASS_GREEN,
     TILE_SIZE,
     BUTTONS_DIR,
-    BLUE_UNITS_ARCHER_ARROW_DIR
+    BLUE_UNITS_ARCHER_ARROW_DIR,
+    MACHINEGUN
 )
 
 
@@ -23,6 +25,7 @@ class TowerDefenceGame:
         self.height = HEIGHT
         self.clock = pygame.time.Clock()
         self.running = True
+        self.playing = False
 
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Tower Defence Game")
@@ -41,15 +44,18 @@ class TowerDefenceGame:
         self.warrior_champion_spawn_button = Button(500, 1415, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
         self.archer_champion_spawn_button = Button(500, 1415, 80, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
 
-        self.enemies = []
-
         self.champion = None
         self.champion_spawned = False
 
         self.menu = Menu(self.screen, [self.enemy_spawn_button, self.warrior_champion_spawn_button, self.archer_champion_spawn_button])
 
-        self.projectiles = []
-        self.arrows = []
+        self.all_sprites = pygame.sprite.LayeredUpdates()
+        self.units = pygame.sprite.LayeredUpdates()
+        self.enemies = pygame.sprite.LayeredUpdates()
+        self.champions = pygame.sprite.LayeredUpdates()
+        self.projectiles = pygame.sprite.LayeredUpdates()
+        self.blocks = pygame.sprite.LayeredUpdates()
+        self.attacks = pygame.sprite.LayeredUpdates()
 
     def create_background(self):#
         background = pygame.Surface((self.width, self.height))
@@ -79,20 +85,24 @@ class TowerDefenceGame:
                 if event.key == pygame.K_ESCAPE:
                     self.menu.toggle()
 
-    def spawn_enemy(self):
-        enemy = EnemyUnitWarrior(
-            x=0,
-            y=300,
+    def spawn_enemy(self, x=0, y=300):
+        EnemyUnitWarrior(
+            game= self,
+            x=x,
+            y=y,
             speed=2
         )
-        self.enemies.append(enemy)
+
+    def despawn_champion(self):
+        if self.champion is not None:
+            self.champion.kill()
+            self.champion = None
+
+        self.champion_spawned = False
 
     def update(self):
         keys = pygame.key.get_pressed()
         if self.champion_spawned:
-            colliders = []
-            for e in self.enemies:
-                colliders.append(e)
 
             self.champion.moving = False
 
@@ -112,74 +122,63 @@ class TowerDefenceGame:
 
             if keys[pygame.K_SPACE]:
                 self.champion.attack()
-            if not self.champion.moving and self.champion.state not in ["attack", "guard"]:
+            if keys[pygame.K_r] and self.champion.type == 'archer' and MACHINEGUN == True:
+                self.champion.machine_gun()
+            if keys[pygame.K_g]:
+                self.spawn_enemy(random.randint(50,1550), random.randint(50,950))
+            if not self.champion.moving and self.champion.state not in ["attack", "guard", "death"]:
                 self.champion.set_state("idle")
-            self.champion.update()
 
-            if self.champion.health <= 0:
+            if self.champion.death_finished:
                 self.champion = None
                 self.champion_spawned = False
 
+        for projectile in self.projectiles:
+            hit_enemies = pygame.sprite.spritecollide(projectile, self.enemies, False)
 
-        if self.enemies:
-                for enemy in self.enemies:
-                    if self.champion.check_collision(enemy.rect):
-                        self.champion.hitbox_colour = (0, 255, 0)
-                        print("unit collision")
-                    else:
-                        self.champion.hitbox_colour = (255, 0, 0)
-                    for projectile in self.projectiles:
-                        if projectile.check_collision(enemy.rect):
-                            enemy.take_damage(projectile.damage)
-                            projectile.alive = False
-                            print("arrow collision")
+            for enemy in hit_enemies:
+                if not enemy.dead:
+                    enemy.take_damage(projectile.damage)
+                    projectile.kill()
+                    print("arrow collision")
 
-
-
-        self.enemies = [
-            enemy for enemy in self.enemies
-            if enemy.rect.left < self.width
-        ]
+        self.all_sprites.update()
 
         for enemy in self.enemies:
-            enemy.update()
-            if enemy.health <= 0:
-                self.enemies.remove(enemy)
+            if enemy.rect.left >= self.width:
+                enemy.kill()
 
-        for projectile in self.projectiles: projectile.update()
+        for enemy in self.enemies:
+            if enemy.death_finished:
+                enemy.kill()
+
 
     def draw(self):
         self.screen.blit(self.background, (0,0))
+
         clicked = self.menu.draw()
         if clicked == self.enemy_spawn_button:
             self.spawn_enemy()
+
         elif clicked == self.warrior_champion_spawn_button:
-            self.champion = WarriorChampionUnit(x=0, y=300)
-            self.champion.projectiles = self.projectiles
-            self.champion_spawned = not self.champion_spawned
-            if self.champion_spawned:
+            if not self.champion_spawned:
+                self.champion = WarriorChampionUnit(game=self,x=0, y=300)
+                self.champion_spawned = True
                 self.champion.spawn(WIDTH // 2, HEIGHT // 2)
-            else:
-                self.champion.despawn()
+            else: self.despawn_champion()
 
         elif clicked == self.archer_champion_spawn_button:
-            self.champion = ArcherChampionUnit(x=0, y=300)
-            self.champion.projectiles = self.projectiles
-            self.champion_spawned = not self.champion_spawned
-            if self.champion_spawned:
+            if not self.champion_spawned:
+                self.champion = ArcherChampionUnit(game=self,x=0, y=300)
+                self.champion_spawned = True
                 self.champion.spawn(WIDTH // 2, HEIGHT // 2)
-            else:
-                self.champion.despawn()
+            else: self.despawn_champion()
 
-        if self.champion_spawned:
-            self.champion.draw(self.screen)
-            self.champion.draw_health(self.screen)
+        for sprite in self.all_sprites:
+            sprite.draw(self.screen)
 
-        for enemy in self.enemies: enemy.draw(self.screen), enemy.draw_health(self.screen)
-        for projectile in self.projectiles: projectile.draw(self.screen)
-
-        if self.champion_spawned:
-            self.projectiles = [projectile for projectile in self.champion.projectiles if projectile.alive and not projectile.is_off_screen()]
+            if hasattr(sprite, "draw_health") and not sprite.dead:
+                sprite.draw_health(self.screen)
 
         pygame.display.flip()
 
@@ -189,4 +188,7 @@ class TowerDefenceGame:
             self.handle_events()
             if not self.menu.open:
                 self.update()
+                self.playing = True
+            else:
+                self.playing = False
             self.draw()

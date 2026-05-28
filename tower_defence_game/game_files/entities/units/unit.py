@@ -1,6 +1,7 @@
 import pygame
-from game_files.utils.settings import ANIMATION_FPS, HITBOXES
+from game_files.utils.settings import ANIMATION_FPS, HITBOXES, PARTICLE_DIR
 from game_files.entities.entity import Entity
+from game_files.systems.spritesheet import Spritesheet
 
 def draw_health_bar(surface, pos, size, borderC, backC, healthC, progress):
     pygame.draw.rect(surface, backC, (*pos, *size))
@@ -11,8 +12,11 @@ def draw_health_bar(surface, pos, size, borderC, backC, healthC, progress):
     pygame.draw.rect(surface, healthC, rect)
 
 class Unit(Entity):
-    def __init__(self, x, y, max_health=100, speed=2):
-        super().__init__(None, x, y)
+    def __init__(self, game, x, y, max_health=100, speed=2, groups=None):
+        if groups is None:
+            groups = []
+
+        super().__init__(game, None, x, y, [game.units, *groups])
 
         self.max_health = max_health
         self.health = max_health
@@ -20,6 +24,10 @@ class Unit(Entity):
 
         self.direction = 1
         self.moving = False
+
+        self.dead = False
+        self.death_finished = False
+        self.death_pos = None
 
         self.state = "idle"
         self.frame_index = 0
@@ -29,7 +37,12 @@ class Unit(Entity):
             "idle": [],
             "walk": [],
             "attack": [],
+            "death": []
         }
+
+        self.death_effect = Spritesheet('Dust_02.png', PARTICLE_DIR)
+        self.animations['death'] = self.death_effect.get_frames_row(0, 64, 64, 10)
+
 
         self.attack_damage = 25
         self.attack_range = 60
@@ -49,6 +62,14 @@ class Unit(Entity):
             self.frame_index = (self.frame_index + 1) % len(self.animations[self.state])
             self.last_frame_time = now
 
+        if self.health <= 0 and self.state != "death":
+            self.death_pos = self.rect.center
+            self.set_state("death")
+            self.dead = True
+
+        if self.state == "death" and self.frame_index == len(self.animations["death"]) - 1:
+            self.death_finished = True
+
 
     def draw(self, screen):
         if not self.animations.get(self.state):
@@ -59,9 +80,14 @@ class Unit(Entity):
         if self.direction == -1:
             frame = pygame.transform.flip(frame, True, False)
 
-        screen.blit(frame, (self.x, self.y))
+        if self.state == "death":
+            draw_rect = frame.get_rect(center=self.death_pos)
+        else:
+            draw_rect = frame.get_rect(topleft=(self.x, self.y))
+
+        screen.blit(frame, draw_rect.topleft)
         bound = frame.get_bounding_rect()
-        self.rect = bound.move(self.x, self.y)
+        self.rect = bound.move(draw_rect.x, draw_rect.y)
 
         if HITBOXES:
             self.show_hitbox(screen, self.hitbox_colour)
@@ -77,6 +103,9 @@ class Unit(Entity):
         pygame.draw.rect(screen, colour, self.rect, 2)
 
     def move(self, dx, dy):
+        if self.health <= 0:
+            return
+
         if dx == 0 and dy == 0:
             return
 

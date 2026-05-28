@@ -5,8 +5,8 @@ from game_files.utils.settings import RED_UNITS_WARRIOR_DIR
 
 
 class EnemyUnitWarrior(EnemyUnit):
-    def __init__(self, x, y, max_health=100, speed=2):
-        super().__init__(x, y, max_health, speed)
+    def __init__(self,game, x, y, max_health=100, speed=2):
+        super().__init__(game,x, y, max_health, speed)
 
         self.path = RED_UNITS_WARRIOR_DIR
         self.sprite = Spritesheet("Warrior_Idle.png", path=self.path)
@@ -21,9 +21,10 @@ class EnemyUnitWarrior(EnemyUnit):
         self.animations["attack2"] = self.attack2_sprite.get_frames_row(0,192,192,4)
 
     def update(self):
-        self.moving = False
+        if self.health > 0:
+            self.moving = False
 
-        self.move(self.direction * self.speed, 0)
-        self.set_state("walk" if self.moving else "idle")
+            self.move(self.direction * self.speed, 0)
+            self.set_state("walk" if self.moving else "idle")
         super().update()
 
