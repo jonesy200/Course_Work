@@ -1,4 +1,13 @@
-20.5.26 :
-add death animation,
-add knight attack
-add sound effects
+20.5.26:
+add death animation DONE 21.5.26
+add knight attack TODO
+add sound effects TODO
+
+21.5.26
+ADDED DEATH ANIMATION
+fix death animation DONE 28.5.26
+
+28.5.26
+refactored game structure and now use pygame sprite class DONE 28.5.26
+add sprite layer handling TODO
+

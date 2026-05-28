@@ -4,8 +4,8 @@ from game_files.utils.settings import PROJECTILE_VELOCITY, WIDTH, HEIGHT, HITBOX
 from game_files.entities.entity import Entity
 
 class Projectile(Entity):
-    def __init__(self, x, y, target_x, target_y, image, damage=67):
-        super().__init__(None, x, y)
+    def __init__(self, game,x, y, target_x, target_y, image, damage=67):
+        super().__init__(game, None, x, y, [game.projectiles])
         self.image = image
         self.damage = damage
 
@@ -38,6 +38,8 @@ class Projectile(Entity):
         self.z += self.vel_z
         self.vel_z -= self.gravity
 
+        self.rect.center = (int(self.x), int(self.y - self.z))
+
         if self.z <= 0:
             self.z = 0
             self.vel_z = 0
@@ -46,7 +48,10 @@ class Projectile(Entity):
 
             self.grounded_timer += 1
             if self.grounded_timer > 30:
-                self.alive = False
+                self.kill()
+
+        if self.is_off_screen():
+            self.kill()
 
     def draw(self, screen):
         angle = self.angle
