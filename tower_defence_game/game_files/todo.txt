@@ -13,3 +13,9 @@ TODO add sprite layer handling
 
 12.6.26
 add castle/tower
+
+15.6.26
+TODO add a camera which can move around/zoom in/out
+TODO make camera zoom in when champion is spawned and cannot be adjusted anymore/minimally
+TODO resize characters
+TODO organise positions of buildings properly

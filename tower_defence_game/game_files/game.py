@@ -1,8 +1,11 @@
 import pygame
 import random
+import os
 from game_files.entities.units.enemy_units.enemy_unit_types.warrior_enemy_unit import EnemyUnitWarrior
 from game_files.entities.units.friendly_units.champion_units.archer_champion_unit import ArcherChampionUnit
 from game_files.entities.units.friendly_units.champion_units.warrior_champion_unit import WarriorChampionUnit
+from game_files.entities.buildings.building import Building
+from game_files.entities.buildings.castle import Castle
 from game_files.ui.button import Button
 from game_files.ui.menu import Menu
 from game_files.utils.settings import (
@@ -29,31 +32,43 @@ class TowerDefenceGame:
 
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Tower Defence Game")
-        icon_path = LOGOS_DIR / "grey shield logo.webp"
+        icon_path = os.path.join(LOGOS_DIR, "grey shield logo.webp")
         self.icon = pygame.image.load(icon_path)
         pygame.display.set_icon(self.icon)
         self.background = self.create_background()
 
-        blue_square_button_small_reg_path = BUTTONS_DIR / "SmallBlueSquareButton_Regular.png"
-        blue_square_button_small_pressed_path = BUTTONS_DIR / "SmallBlueSquareButton_Pressed.png"
+        blue_square_button_small_reg_path = os.path.join(BUTTONS_DIR, "SmallBlueSquareButton_Regular.png")
+        blue_square_button_small_pressed_path = os.path.join(BUTTONS_DIR, "SmallBlueSquareButton_Pressed.png")
 
         self.blue_square_button_small_reg_img = pygame.image.load(blue_square_button_small_reg_path).convert_alpha()
         self.blue_square_button_small_pressed_img = pygame.image.load(blue_square_button_small_pressed_path).convert_alpha()
 
-        self.enemy_spawn_button = Button(500, 1500, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
         self.warrior_champion_spawn_button = Button(500, 1415, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
-        self.archer_champion_spawn_button = Button(500, 1415, 80, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
+        self.archer_champion_spawn_button = Button(500, 1415, 100, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
+
+        self.enemy_spawn_button = Button(500, 1500, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
+
+        self.spawn_castle_button = Button(500, 1500, 100, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
 
         self.champion = None
         self.champion_spawned = False
 
-        self.menu = Menu(self.screen, [self.enemy_spawn_button, self.warrior_champion_spawn_button, self.archer_champion_spawn_button])
+        self.menu = Menu(self.screen, [self.enemy_spawn_button, self.warrior_champion_spawn_button, self.archer_champion_spawn_button, self.spawn_castle_button])
 
         self.all_sprites = pygame.sprite.LayeredUpdates()
+
+        self.buildings = pygame.sprite.LayeredUpdates()
+        self.castles = pygame.sprite.LayeredUpdates()
+        self.towers = pygame.sprite.LayeredUpdates()
+        self.houses = pygame.sprite.LayeredUpdates()
+
         self.units = pygame.sprite.LayeredUpdates()
+        self.friendly_units = pygame.sprite.LayeredUpdates()
         self.enemies = pygame.sprite.LayeredUpdates()
         self.champions = pygame.sprite.LayeredUpdates()
+
         self.projectiles = pygame.sprite.LayeredUpdates()
+
         self.blocks = pygame.sprite.LayeredUpdates()
         self.attacks = pygame.sprite.LayeredUpdates()
 
@@ -62,7 +77,7 @@ class TowerDefenceGame:
         background.fill(GRASS_GREEN)
 
         try:
-            tileset_path = TILESET_DIR / "Tilemap_color1.png"
+            tileset_path = os.path.join(TILESET_DIR, "Tilemap_color1.png")
             tileset = pygame.image.load(tileset_path).convert_alpha()
 
             grass_tile = tileset.subsurface((24, 24, TILE_SIZE, TILE_SIZE))
@@ -99,6 +114,25 @@ class TowerDefenceGame:
             self.champion = None
 
         self.champion_spawned = False
+
+    def spawn_building(self, x, y, max_health=1000):
+        Building(
+            game= self,
+            x=x,
+            y=y,
+            max_health=max_health
+        )
+
+    def spawn_castle(self, x, y, max_health=1000):
+        Castle(
+            game=self,
+            x=x,
+            y=y,
+            max_health=max_health
+        )
+
+    def draw_buildings(self):
+        self.buildings.draw(self.screen)
 
     def update(self):
         keys = pygame.key.get_pressed()
@@ -152,13 +186,15 @@ class TowerDefenceGame:
             if enemy.death_finished:
                 enemy.kill()
 
-
     def draw(self):
         self.screen.blit(self.background, (0,0))
 
         clicked = self.menu.draw()
         if clicked == self.enemy_spawn_button:
             self.spawn_enemy()
+
+        if clicked == self.spawn_castle_button:
+            self.spawn_castle(self.width // 2, self.height // 2)
 
         elif clicked == self.warrior_champion_spawn_button:
             if not self.champion_spawned:
@@ -180,6 +216,7 @@ class TowerDefenceGame:
             if hasattr(sprite, "draw_health") and not sprite.dead:
                 sprite.draw_health(self.screen)
 
+        self.draw_buildings()
         pygame.display.flip()
 
     def run(self):

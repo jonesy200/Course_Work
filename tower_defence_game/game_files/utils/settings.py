@@ -1,49 +1,54 @@
 from pathlib import Path
+import os
 
 #DIRECTORIES
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-ASSETS_DIR = BASE_DIR / "assets"
+ASSETS_DIR = os.path.join(BASE_DIR,"assets")
 
-IMAGES_DIR = ASSETS_DIR / "images"
-SOUNDS_DIR = ASSETS_DIR / "sounds"
-FONTS_DIR = ASSETS_DIR / "fonts"
+IMAGES_DIR = os.path.join(ASSETS_DIR, "images")
+SOUNDS_DIR = os.path.join(ASSETS_DIR, "sounds")
+FONTS_DIR = os.path.join(ASSETS_DIR, "fonts")
 
-UI_IMAGES_DIR = IMAGES_DIR / "ui"
-LOGOS_DIR = UI_IMAGES_DIR / "logos"
+UI_IMAGES_DIR = os.path.join(IMAGES_DIR, "ui")
+LOGOS_DIR = os.path.join(UI_IMAGES_DIR, "logos")
 
 #TEMP DOWNLOADED ASSETS FOLDER
-DOWNLOADED_ASSETS_DIR = ASSETS_DIR / "downloaded_from_online"
-TINY_SWORDS_DIR = DOWNLOADED_ASSETS_DIR / "Tiny Swords (Free Pack)"
+DOWNLOADED_ASSETS_DIR = os.path.join(ASSETS_DIR, "downloaded_from_online")
+TINY_SWORDS_DIR = os.path.join(DOWNLOADED_ASSETS_DIR, "Tiny Swords (Free Pack)")
 
 #PARTICLES
-PARTICLE_DIR = TINY_SWORDS_DIR / "Particle FX"
+PARTICLE_DIR = os.path.join(TINY_SWORDS_DIR, "Particle FX")
 
 #UI ELEMENTS
-UI_ELEMENTS_DIR = TINY_SWORDS_DIR / "UI Elements" / "UI Elements"
+UI_ELEMENTS_DIR = os.path.join(TINY_SWORDS_DIR, "UI Elements", "UI Elements")
 
-BUTTONS_DIR = UI_ELEMENTS_DIR / "Buttons"
-PAPERS_DIR = UI_ELEMENTS_DIR / "Papers"
+BUTTONS_DIR = os.path.join(UI_ELEMENTS_DIR, "Buttons")
+PAPERS_DIR = os.path.join(UI_ELEMENTS_DIR, "Papers")
 
 #TERRAIN
-TERRAIN_DIR = TINY_SWORDS_DIR / "Terrain"
-TILESET_DIR = TERRAIN_DIR / "Tileset"
+TERRAIN_DIR = os.path.join(TINY_SWORDS_DIR, "Terrain")
+TILESET_DIR = os.path.join(TERRAIN_DIR, "Tileset")
+
+#BUILDINGS
+BUILDINGS_DIR = os.path.join(TINY_SWORDS_DIR, "Buildings")
+BLACK_BUILDINGS_DIR = os.path.join(BUILDINGS_DIR, "Black Buildings")
 
 #UNITS
-UNITS_DIR = TINY_SWORDS_DIR / "Units"
+UNITS_DIR = os.path.join(TINY_SWORDS_DIR, "Units")
 
-BLACK_UNITS_DIR = UNITS_DIR / "Black Units"
-BLACK_UNITS_WARRIOR_DIR = BLACK_UNITS_DIR / "Warrior"
-BLACK_UNITS_ARCHER_DIR = BLACK_UNITS_DIR / "Archer"
-BLACK_UNITS_ARCHER_ARROW_DIR = BLACK_UNITS_ARCHER_DIR / "Arrow.png"
+BLACK_UNITS_DIR = os.path.join(UNITS_DIR, "Black Units")
+BLACK_UNITS_WARRIOR_DIR = os.path.join(BLACK_UNITS_DIR, "Warrior")
+BLACK_UNITS_ARCHER_DIR = os.path.join(BLACK_UNITS_DIR, "Archer")
+BLACK_UNITS_ARCHER_ARROW_DIR = os.path.join(BLACK_UNITS_ARCHER_DIR, "Arrow.png")
 
-RED_UNITS_DIR = UNITS_DIR / "Red Units"
-RED_UNITS_WARRIOR_DIR = RED_UNITS_DIR / "Warrior"
+RED_UNITS_DIR = os.path.join(UNITS_DIR, "Red Units")
+RED_UNITS_WARRIOR_DIR = os.path.join(RED_UNITS_DIR, "Warrior")
 
-BLUE_UNITS_DIR = UNITS_DIR / "Blue Units"
-BLUE_UNITS_WARRIOR_DIR = BLUE_UNITS_DIR / "Warrior"
-BLUE_UNITS_ARCHER_DIR = BLUE_UNITS_DIR / "Archer"
-BLUE_UNITS_ARCHER_ARROW_DIR = BLUE_UNITS_ARCHER_DIR / "Arrow.png"
+BLUE_UNITS_DIR = os.path.join(UNITS_DIR, "Blue Units")
+BLUE_UNITS_WARRIOR_DIR = os.path.join(BLUE_UNITS_DIR, "Warrior")
+BLUE_UNITS_ARCHER_DIR = os.path.join(BLUE_UNITS_DIR, "Archer")
+BLUE_UNITS_ARCHER_ARROW_DIR = os.path.join(BLUE_UNITS_ARCHER_DIR, "Arrow.png")
 
 #ANIMATIONS
 ANIMATION_FPS = 10 #10fps / 100ms

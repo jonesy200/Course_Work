@@ -1,6 +1,6 @@
 import pygame
 from game_files.entities.units.friendly_units.friendly_unit import FriendlyUnit
-from game_files.utils.settings import ANIMATION_FPS, MACHINEGUN
+from game_files.utils.settings import ANIMATION_FPS
 
 class ChampionUnit(FriendlyUnit):
     def __init__(self, game, x, y, max_health=100, speed=2):

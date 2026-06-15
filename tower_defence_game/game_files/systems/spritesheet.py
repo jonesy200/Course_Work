@@ -1,9 +1,10 @@
 import pygame
+import os
 
 class Spritesheet:
     def __init__(self, filename, path):
         self.path = path
-        full_path = self.path / filename
+        full_path = os.path.join(self.path, filename)
         self.sheet = pygame.image.load(full_path).convert_alpha()
 
     def get_frame(self, x, y, width, height):
