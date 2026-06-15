@@ -125,12 +125,6 @@ class Unit(Entity):
             self.frame_index = 0
             self.last_frame_time = 0
 
-    def take_damage(self, damage):
-        self.health -= damage
-
-    def is_dead(self):
-        return self.health <= 0
-
     def attack(self):
         pass
 

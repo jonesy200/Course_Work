@@ -18,7 +18,8 @@ from game_files.utils.settings import (
     TILE_SIZE,
     BUTTONS_DIR,
     BLUE_UNITS_ARCHER_ARROW_DIR,
-    MACHINEGUN
+    MACHINEGUN,
+    BLACK_BUILDINGS_DIR
 )
 
 
@@ -39,6 +40,7 @@ class TowerDefenceGame:
 
         blue_square_button_small_reg_path = os.path.join(BUTTONS_DIR, "SmallBlueSquareButton_Regular.png")
         blue_square_button_small_pressed_path = os.path.join(BUTTONS_DIR, "SmallBlueSquareButton_Pressed.png")
+        black_castle_path = os.path.join(BLACK_BUILDINGS_DIR, "Castle.png")
 
         self.blue_square_button_small_reg_img = pygame.image.load(blue_square_button_small_reg_path).convert_alpha()
         self.blue_square_button_small_pressed_img = pygame.image.load(blue_square_button_small_pressed_path).convert_alpha()
@@ -120,7 +122,8 @@ class TowerDefenceGame:
             game= self,
             x=x,
             y=y,
-            max_health=max_health
+            max_health=max_health,
+            asset_path=None
         )
 
     def spawn_castle(self, x, y, max_health=1000):

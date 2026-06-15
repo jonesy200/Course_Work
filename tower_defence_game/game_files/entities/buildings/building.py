@@ -4,14 +4,17 @@ from game_files.entities.entity import Entity
 from game_files.utils.settings import BLACK_BUILDINGS_DIR
 
 class Building(Entity):
-    def __init__(self, game, x, y, max_health, groups=None):
+    def __init__(self, game, x, y, max_health, asset_path, groups=None):
         super().__init__(game, None, x, y, groups=game.buildings)
+
+        if asset_path == None:
+            print("Error code 10: No asset path specified.")
 
         self.max_health = max_health
         self.health = max_health
         self.destroyed = False
 
-        self.path = os.path.join(BLACK_BUILDINGS_DIR,"Castle.png")
+        self.path = asset_path
         self.image = pygame.image.load(self.path).convert_alpha()
         self.state = {
             "normal": self.image,

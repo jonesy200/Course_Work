@@ -27,3 +27,9 @@ class Entity(pygame.sprite.Sprite):
             return True
         else:
             return False
+
+    def take_damage(self, damage):
+        self.health -= damage
+
+    def is_dead(self):
+        return self.health <= 0
