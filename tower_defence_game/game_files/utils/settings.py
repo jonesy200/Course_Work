@@ -78,3 +78,10 @@ PROJECTILE_VELOCITY = 8
 #DEBUG
 HITBOXES = True
 MACHINEGUN = True
+BUILDING_SCALE = 1.6
+
+
+#SAVED STUFF
+'''
+print("\t".join(map(str,row))) OR print(*row, sep="\t") : print a grid of 2d array
+'''

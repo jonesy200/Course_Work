@@ -4,6 +4,7 @@ import os
 from game_files.entities.units.enemy_units.enemy_unit_types.warrior_enemy_unit import EnemyUnitWarrior
 from game_files.entities.units.friendly_units.champion_units.archer_champion_unit import ArcherChampionUnit
 from game_files.entities.units.friendly_units.champion_units.warrior_champion_unit import WarriorChampionUnit
+from game_files.systems.collision_grid import CollisionGrid
 from game_files.entities.buildings.building import Building
 from game_files.entities.buildings.castle import Castle
 from game_files.ui.button import Button
@@ -19,7 +20,8 @@ from game_files.utils.settings import (
     BUTTONS_DIR,
     BLUE_UNITS_ARCHER_ARROW_DIR,
     MACHINEGUN,
-    BLACK_BUILDINGS_DIR
+    BLACK_BUILDINGS_DIR,
+    BUILDING_SCALE
 )
 
 
@@ -30,6 +32,7 @@ class TowerDefenceGame:
         self.clock = pygame.time.Clock()
         self.running = True
         self.playing = False
+        self.showing_grid = False
 
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Tower Defence Game")
@@ -49,13 +52,15 @@ class TowerDefenceGame:
         self.archer_champion_spawn_button = Button(500, 1415, 100, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
 
         self.enemy_spawn_button = Button(500, 1500, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
-
         self.spawn_castle_button = Button(500, 1500, 100, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
+
+        self.visualise_grid_button = Button(500, 1415, 190, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
 
         self.champion = None
         self.champion_spawned = False
 
-        self.menu = Menu(self.screen, [self.enemy_spawn_button, self.warrior_champion_spawn_button, self.archer_champion_spawn_button, self.spawn_castle_button])
+        self.menu = Menu(self.screen, [self.enemy_spawn_button, self.warrior_champion_spawn_button, self.archer_champion_spawn_button, self.spawn_castle_button, self.visualise_grid_button])
+        self.collision_grid = CollisionGrid(self, self.width, self.height, cell_size=64)
 
         self.all_sprites = pygame.sprite.LayeredUpdates()
 
@@ -131,11 +136,18 @@ class TowerDefenceGame:
             game=self,
             x=x,
             y=y,
+            scale=BUILDING_SCALE,
             max_health=max_health
         )
 
     def draw_buildings(self):
         self.buildings.draw(self.screen)
+
+    def visualise_grid(self):
+        self.showing_grid = True
+
+    def remove_grid(self):
+        self.showing_grid = False
 
     def update(self):
         keys = pygame.key.get_pressed()
@@ -191,13 +203,22 @@ class TowerDefenceGame:
 
     def draw(self):
         self.screen.blit(self.background, (0,0))
+        if self.showing_grid:
+            self.collision_grid.visualize_grid()
 
         clicked = self.menu.draw()
         if clicked == self.enemy_spawn_button:
             self.spawn_enemy()
 
-        if clicked == self.spawn_castle_button:
-            self.spawn_castle(self.width // 2, self.height // 2)
+        elif clicked == self.spawn_castle_button:
+            self.spawn_castle(WIDTH // 2 , 160)
+
+        elif clicked == self.visualise_grid_button:
+            self.showing_grid = not self.showing_grid
+            if self.showing_grid:
+                self.visualise_grid()
+            if not self.showing_grid:
+                self.remove_grid()
 
         elif clicked == self.warrior_champion_spawn_button:
             if not self.champion_spawned:
