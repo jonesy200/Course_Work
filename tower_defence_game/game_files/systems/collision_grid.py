@@ -1,8 +1,15 @@
 import math
 import pygame
+from game_files.utils.settings import (
+RED,
+GREEN,
+BLUE,
+WHITE,
+BLACK
+)
 
 class CollisionGrid:
-    def __init__(self, game, world_width, world_height, cell_size=64):
+    def __init__(self, game, world_width, world_height, cell_size=16):
         self.game = game
 
         self.world_width = world_width
@@ -28,33 +35,23 @@ class CollisionGrid:
 
         self.squares = pygame.sprite.LayeredUpdates()
 
-    def create_square(self, x, y, color):
-        Square(self.game, self, x, y, color,groups=self.squares)
-
     def visualize_grid(self):
-        y = 0
-        for row in self.grid:
-            x = 0
-            for item in row:
-                if item == 0:
-                    self.create_square(x, y, (255, 255, 255))
-                else:
-                    self.create_square(x, y, (0, 0, 0))
+        for row in range(self.grid_rows):
+            for col in range(self.grid_cols):
+                color = WHITE if self.grid[row][col] == 0 else BLACK
 
-                x += self.grid_node_width
-            y += self.grid_node_height
+                pygame.draw.rect(
+                    self.game.screen,
+                    color,
+                    (
+                        col * self.cell_size,
+                        row * self.cell_size,
+                        self.cell_size,
+                        self.cell_size,
+                    ),
+                    1
+                )
 
     def remove_grid(self):
         for square in self.squares:
             square.kill()
-
-class Square:
-    def __init__(self, game, collision_grid, x, y, color, groups=None):
-        self.x = x
-        self.y = y
-        self.color = color
-        self.game = game
-        self.collision_grid = collision_grid
-
-    def draw(self):
-        pygame.draw.rect(self.game.screen, self.color, [self.x, self.y, self.collision_grid.grid_node_width, self.collision_grid.grid_node_height])

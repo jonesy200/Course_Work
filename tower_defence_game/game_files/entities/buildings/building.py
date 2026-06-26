@@ -30,7 +30,7 @@ class Building(Entity):
         self.rect = image.get_rect(center=(self.x, self.y))
         self.rect = self.rect.scale_by(self.scale)
 
-        self.game.collision_grid.add_building(self)
+        #self.game.collision_grid.add_building(self)
 
     def update(self):
         if self.health < 0:

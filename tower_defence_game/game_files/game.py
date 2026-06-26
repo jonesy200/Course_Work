@@ -60,7 +60,7 @@ class TowerDefenceGame:
         self.champion_spawned = False
 
         self.menu = Menu(self.screen, [self.enemy_spawn_button, self.warrior_champion_spawn_button, self.archer_champion_spawn_button, self.spawn_castle_button, self.visualise_grid_button])
-        self.collision_grid = CollisionGrid(self, self.width, self.height, cell_size=64)
+        self.collision_grid = CollisionGrid(self, self.width, self.height, cell_size=10)
 
         self.all_sprites = pygame.sprite.LayeredUpdates()
 
@@ -127,6 +127,7 @@ class TowerDefenceGame:
             game= self,
             x=x,
             y=y,
+            scale=BUILDING_SCALE,
             max_health=max_health,
             asset_path=None
         )
@@ -201,10 +202,20 @@ class TowerDefenceGame:
             if enemy.death_finished:
                 enemy.kill()
 
+        for sprite in self.all_sprites:
+            row = int(sprite.y // self.collision_grid.cell_size)
+            col = int(sprite.x // self.collision_grid.cell_size)
+
+            if 0 <= row < self.collision_grid.grid_rows and 0 <= col < self.collision_grid.grid_cols:
+                self.collision_grid.grid[row][col] = 1
+
+
     def draw(self):
         self.screen.blit(self.background, (0,0))
         if self.showing_grid:
             self.collision_grid.visualize_grid()
+            for square in self.collision_grid.squares:
+                square.draw()
 
         clicked = self.menu.draw()
         if clicked == self.enemy_spawn_button:
