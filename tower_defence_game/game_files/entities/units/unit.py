@@ -70,7 +70,6 @@ class Unit(Entity):
         if self.state == "death" and self.frame_index == len(self.animations["death"]) - 1:
             self.death_finished = True
 
-
     def draw(self, screen):
         if not self.animations.get(self.state):
             return
@@ -83,7 +82,7 @@ class Unit(Entity):
         if self.state == "death":
             draw_rect = frame.get_rect(center=self.death_pos)
         else:
-            draw_rect = frame.get_rect(topleft=(self.x, self.y))
+            draw_rect = frame.get_rect(center=(self.x, self.y))
 
         screen.blit(frame, draw_rect.topleft)
         bound = frame.get_bounding_rect()

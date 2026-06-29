@@ -48,13 +48,13 @@ class TowerDefenceGame:
         self.blue_square_button_small_reg_img = pygame.image.load(blue_square_button_small_reg_path).convert_alpha()
         self.blue_square_button_small_pressed_img = pygame.image.load(blue_square_button_small_pressed_path).convert_alpha()
 
-        self.warrior_champion_spawn_button = Button(500, 1415, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
-        self.archer_champion_spawn_button = Button(500, 1415, 100, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
+        self.warrior_champion_spawn_button = Button(500, 1415, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8, text="Spawn champion (W)")
+        self.archer_champion_spawn_button = Button(500, 1415, 100, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8, text="Spawn champion (A)")
 
-        self.enemy_spawn_button = Button(500, 1500, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
-        self.spawn_castle_button = Button(500, 1500, 100, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
+        self.enemy_spawn_button = Button(500, 1500, 10, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8, text="Spawn enemy (W)")
+        self.spawn_castle_button = Button(500, 1500, 100, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8, text="Spawn castle")
 
-        self.visualise_grid_button = Button(500, 1415, 190, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8)
+        self.visualise_grid_button = Button(500, 1415, 190, self.blue_square_button_small_reg_img, self.blue_square_button_small_pressed_img, 0.8, text="Collision grid")
 
         self.champion = None
         self.champion_spawned = False
@@ -202,13 +202,54 @@ class TowerDefenceGame:
             if enemy.death_finished:
                 enemy.kill()
 
-        for sprite in self.all_sprites:
-            row = int(sprite.y // self.collision_grid.cell_size)
-            col = int(sprite.x // self.collision_grid.cell_size)
+        for x in range(self.collision_grid.grid_cols):
+            for y in range(self.collision_grid.grid_rows):
+                self.collision_grid.grid[y][x] = 0
 
-            if 0 <= row < self.collision_grid.grid_rows and 0 <= col < self.collision_grid.grid_cols:
-                self.collision_grid.grid[row][col] = 1
+        for sprite in self.units:
+            topleftx, toplefty = sprite.rect.topleft
+            toprightx, toprighty = sprite.rect.topright
+            bottomleftx, bottomlefty = sprite.rect.bottomleft
+            bottomrightx, bottomrighty = sprite.rect.bottomright
+            left = sprite.rect.left
+            right = sprite.rect.right
+            top = sprite.rect.top
+            bottom = sprite.rect.bottom
+            centerx = sprite.rect.centerx
+            centery = sprite.rect.centery
 
+            points = [
+                (topleftx, toplefty),
+                (toprightx, toprighty),
+                (bottomleftx, bottomlefty),
+                (bottomrightx, bottomrighty),
+                (left, centery),
+                (right, centery),
+                (centerx, top),
+                (centerx, bottom)
+            ]
+
+            for (x, y) in points:
+                grid_x = int(x // self.collision_grid.cell_size)
+                grid_y = int(y // self.collision_grid.cell_size)
+
+                if 0 <= grid_x < self.collision_grid.grid_cols and 0 <= grid_y < self.collision_grid.grid_rows:
+                    self.collision_grid.grid[grid_y][grid_x] = 1
+
+            for building in self.buildings:
+
+                rect = building.rect
+                mask = pygame.mask.from_surface(building.image)
+                outline_points = mask.outline()
+
+                for point in outline_points:
+                    x = rect.x + point[0]
+                    y = rect.y + point[1]
+                    grid_x = int(x // self.collision_grid.cell_size)
+                    grid_y = int(y // self.collision_grid.cell_size)
+
+                    if 0 <= grid_x < self.collision_grid.grid_cols and 0 <= grid_y < self.collision_grid.grid_rows:
+                        self.collision_grid.grid[grid_y][grid_x] = 1
 
     def draw(self):
         self.screen.blit(self.background, (0,0))
@@ -222,7 +263,7 @@ class TowerDefenceGame:
             self.spawn_enemy()
 
         elif clicked == self.spawn_castle_button:
-            self.spawn_castle(WIDTH // 2 , 160)
+            self.spawn_castle(WIDTH // 2 , 500) # use y=160
 
         elif clicked == self.visualise_grid_button:
             self.showing_grid = not self.showing_grid

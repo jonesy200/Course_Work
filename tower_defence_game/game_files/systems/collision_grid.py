@@ -1,9 +1,6 @@
 import math
 import pygame
 from game_files.utils.settings import (
-RED,
-GREEN,
-BLUE,
 WHITE,
 BLACK
 )

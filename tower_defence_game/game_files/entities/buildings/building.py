@@ -5,7 +5,7 @@ from game_files.utils.settings import BLACK_BUILDINGS_DIR, HITBOXES, RED
 
 class Building(Entity):
     def __init__(self, game, x, y, scale,max_health, asset_path, groups=None):
-        super().__init__(game, None, x, y, groups=game.buildings)
+        super().__init__(game, None, x, y, groups=[game.buildings, *groups])
 
         if asset_path == None:
             print("Error code 10: No asset path specified.")

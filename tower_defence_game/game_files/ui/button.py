@@ -1,8 +1,8 @@
 import pygame
-from game_files.utils.settings import HITBOXES
+from game_files.utils.settings import HITBOXES, WHITE
 
 class Button:
-    def __init__(self, press_time, x, y, image, clicked_image, scale=1):
+    def __init__(self, press_time, x, y, image, clicked_image, scale=1, text="no text"):
         width, height = image.get_width(), image.get_height()
 
         self.press_time = press_time
@@ -11,6 +11,9 @@ class Button:
         self.clicked_image = pygame.transform.scale(clicked_image, (int(clicked_image.get_width() * scale), int(clicked_image.get_height() * scale))).convert_alpha()
 
         self.image_rect = self.image.get_rect(topleft=(x, y))
+        self.text = text
+        self.font = pygame.font.SysFont("Helvetica", 12)
+        self.color = WHITE
 
         mask = pygame.mask.from_surface(self.image)
         bound = mask.get_bounding_rects()
@@ -38,6 +41,7 @@ class Button:
 
         current_image = self.clicked_image if self.clicked else self.image
         screen.blit(current_image, self.image_rect)
+        screen.blit(self.font.render(self.text, False, WHITE), (self.rect.x, self.rect.centery))
 
         return action
 

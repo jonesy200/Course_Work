@@ -17,9 +17,13 @@ add castle/tower
 15.6.26
 TODO add a camera which can move around/zoom in/out
 TODO make camera zoom in when champion is spawned and cannot be adjusted anymore/minimally
-TODO resize characters
-TODO organise positions of buildings properly
+NOT NEEDED resize characters
+organise positions of buildings properly
 TODO make it possible to walk in front of the castle and see character but cannot see character when behind/make the castle a bit transparent to see character
-TODO add second hitbox to collide units with buildings
+NOT NEEDED add second hitbox to collide units with buildings
 add grid for whole map
-TODO make grid show properly
+make grid show properly
+
+29.6.26
+TODO add the actual collisions
+TODO add error codes
