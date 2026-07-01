@@ -52,3 +52,4 @@ class CollisionGrid:
     def remove_grid(self):
         for square in self.squares:
             square.kill()
+

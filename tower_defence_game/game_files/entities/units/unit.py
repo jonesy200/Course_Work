@@ -22,6 +22,11 @@ class Unit(Entity):
         self.health = max_health
         self.speed = speed
 
+        self.x = x
+        self.y = y
+        self.gridx = int(self.x // self.game.collision_grid.cell_size)
+        self.gridy = int(self.y // self.game.collision_grid.cell_size)
+
         self.direction = 1
         self.moving = False
 
@@ -102,6 +107,13 @@ class Unit(Entity):
         pygame.draw.rect(screen, colour, self.rect, 2)
 
     def move(self, dx, dy):
+        future_x = self.x + dx
+        future_y = self.y + dy
+        future_gridx = int(future_x // self.game.collision_grid.cell_size)
+        future_gridy = int(future_y // self.game.collision_grid.cell_size)
+        if self.game.collision_grid[future_gridx][future_gridy] == 1:
+            return
+
         if self.health <= 0:
             return
 
